@@ -1,7 +1,4 @@
 <?
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
 Class Parseali{
 	public function createcsv($create_data, $file = null, $col_delimiter = ';', $row_delimiter = "\r\n"){
 		if( ! is_array($create_data) )
