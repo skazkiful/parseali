@@ -1,5 +1,37 @@
 <?
 Class Parseali{
+	public function __construct(){
+		$y = 0;
+		while($y < 9){
+			$query = $this->getdata($y);
+			$query = substr($query,41);
+			$query = substr($query,0,-1);
+			$query = json_decode($query);
+			if(empty($zagolovki)){
+				foreach($query->gpsProductDetails[0] as $key => $value){
+					if($key !== 'trace'){
+						$zagolovki[] = $key;
+					}
+				}
+				$create_data = array(
+					$zagolovki
+				);
+			}
+			$x = 0;
+			while($x < 12){
+				foreach($query->gpsProductDetails[$x] as $key => $value){
+					if($key !== 'trace' AND $key !== 'benefit' AND $key !== 'offers'){
+						$newdata[] = str_replace(";",",",$value);
+					}
+				}
+				$create_data[] = $newdata;
+				unset($newdata);
+				$x++;
+			}
+			$y++;
+		}
+		$this->createcsv( $create_data, 'csv_file.csv' );
+	}
 	public function createcsv($create_data, $file = null, $col_delimiter = ';', $row_delimiter = "\r\n"){
 		if( ! is_array($create_data) )
 			return false;
@@ -54,7 +86,7 @@ Class Parseali{
 	}
 	public function getdata($offset){
 		sleep(4);
-		$handle=curl_init('https://gpsfront.aliexpress.com/queryGpsProductAjax.do?callback=jQuery18305002855215066833_1552312124554&widget_id=5547572&platform=pc&limit=12&offset='.$offset.'&phase=1&productIds2Top=&postback=&_=1552312124740');
+		$handle=curl_init('https://gpsfront.aliexpress.com/queryGpsProductAjax.do?callback=jQuery18305002855215066833_1552312124554&widget_id=5547572&platform=pc&limit=12&offset='.($offset*12).'&phase=1&productIds2Top=&postback=1&_=1552312124740');
 		curl_setopt($handle, CURLOPT_VERBOSE, true);
 		curl_setopt($handle, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36');
 		curl_setopt ($handle, CURLOPT_REFERER, 'https://flashdeals.aliexpress.com/en.htm');
@@ -66,38 +98,6 @@ Class Parseali{
 
 		return $content;
 	}
-	public function __construct(){
-		$y = 0;
-		while($y < 9){
-			$query = $this->getdata($y);
-			$query = substr($query,41);
-			$query = substr($query,0,-1);
-			$query = json_decode($query);
-			if(empty($zagolovki)){
-				foreach($query->gpsProductDetails[0] as $key => $value){
-					if($key !== 'trace'){
-						$zagolovki[] = $key;
-					}
-				}
-				$create_data = array(
-					$zagolovki
-				);
-			}
-			$x = 0;
-			while($x < 12){
-			foreach($query->gpsProductDetails[$x] as $key => $value){
-				if($key !== 'trace'){
-					$newdata[] = $value;
-				}
-			}
-			$create_data[] = $newdata;
-			unset($newdata);
-			$x++;
-			}
-			$y++;
-		}
-		$this->createcsv( $create_data, 'csv_file.csv' );
-	}
 }
 
-$kek = new Parseali();
+new Parseali();
